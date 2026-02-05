@@ -126,12 +126,31 @@
 
         .category-tag {
             font-size: 0.7rem;
-            padding: 2px 8px;
-            border-radius: 4px;
+            padding: 4px 10px;
+            border-radius: 6px;
             text-transform: uppercase;
             font-weight: 700;
             margin-right: 10px;
             letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+            color: white;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+        }
+
+        .category-tag:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+
+        /* Subtle indicator that it's a dropdown on hover */
+        .category-tag:hover::after {
+            content: ' ▾';
+            font-size: 0.8rem;
         }
 
         .cat-work {
@@ -690,6 +709,18 @@
             saveTasks();
         }
 
+        // ===== CHANGE TASK CATEGORY =====
+        function changeCategory(id, newCategory) {
+            tasks = tasks.map(task => {
+                if (task.id === id) {
+                    task.category = newCategory;
+                }
+                return task;
+            });
+            renderTasks();
+            saveTasks();
+        }
+
         // ===== RENDER TASKS TO THE SCREEN =====
         function renderTasks() {
             const taskList = document.getElementById('taskList');
@@ -703,7 +734,12 @@
                 <li class="task-wrapper">
                     <div class="task-item ${task.completed ? 'completed' : ''}">
                         <div class="checkbox" onclick="toggleTask(${task.id})"></div>
-                        <span class="category-tag cat-${task.category || 'others'}">${task.category || 'others'}</span>
+                        <select class="category-tag cat-${task.category || 'others'}" onchange="changeCategory(${task.id}, this.value)">
+                            <option value="others" ${task.category === 'others' ? 'selected' : ''}>Others</option>
+                            <option value="work" ${task.category === 'work' ? 'selected' : ''}>Work</option>
+                            <option value="personal" ${task.category === 'personal' ? 'selected' : ''}>Personal</option>
+                            <option value="urgent" ${task.category === 'urgent' ? 'selected' : ''}>Urgent</option>
+                        </select>
                         <span class="task-text">${task.text}</span>
                         <div class="task-actions">
                             ${!task.completed ? `<button class="add-subtask-btn" onclick="showSubtaskInput(${task.id})">+ Sub</button>` : ''}

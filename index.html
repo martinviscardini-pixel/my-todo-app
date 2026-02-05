@@ -1,0 +1,802 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>✅ My To-Do App</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* ===== VARIABLES: Easy color customization ===== */
+        :root {
+            --primary: #6366f1;
+            --primary-dark: #4f46e5;
+            --success: #10b981;
+            --danger: #ef4444;
+            --warning: #f59e0b;
+            --bg-dark: #0f172a;
+            --bg-card: #1e293b;
+            --bg-subtask: #283548;
+            --text: #f1f5f9;
+            --text-muted: #94a3b8;
+            --border: #334155;
+        }
+
+        /* ===== RESET & BASE ===== */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        /* ===== MAIN CONTAINER ===== */
+        .container {
+            max-width: 550px;
+            margin: 0 auto;
+        }
+
+        /* ===== HEADER ===== */
+        header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #6366f1, #a855f7, #ec4899);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .subtitle {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* ===== INPUT SECTION ===== */
+        .input-section {
+            display: flex;
+            gap: 12px;
+            margin-bottom: 30px;
+        }
+
+        #taskInput {
+            flex: 1;
+            padding: 16px 20px;
+            font-size: 1rem;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.3s, box-shadow 0.3s;
+        }
+
+        #taskInput:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(99, 102, 241, 0.2);
+        }
+
+        #taskInput::placeholder {
+            color: var(--text-muted);
+        }
+
+        .add-btn {
+            padding: 16px 24px;
+            font-size: 1rem;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--primary), #8b5cf6);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        .add-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(99, 102, 241, 0.4);
+        }
+
+        .add-btn:active {
+            transform: translateY(0);
+        }
+
+        /* ===== CATEGORY TAGS ===== */
+        .category-select {
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 2px solid var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+
+        .category-tag {
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+            font-weight: 700;
+            margin-right: 10px;
+            letter-spacing: 0.5px;
+        }
+
+        .cat-work {
+            background: #3b82f6;
+            color: white;
+        }
+
+        .cat-personal {
+            background: #10b981;
+            color: white;
+        }
+
+        .cat-urgent {
+            background: #ef4444;
+            color: white;
+        }
+
+        .cat-others {
+            background: #64748b;
+            color: white;
+        }
+
+        /* ===== STATS BAR ===== */
+        .stats {
+            display: flex;
+            justify-content: space-between;
+            padding: 16px 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            margin-bottom: 20px;
+            border: 1px solid var(--border);
+        }
+
+        .stat {
+            text-align: center;
+        }
+
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--primary);
+        }
+
+        .stat-label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* ===== TASK LIST ===== */
+        .task-list {
+            list-style: none;
+        }
+
+        .task-wrapper {
+            margin-bottom: 12px;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .task-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 18px 20px;
+            background: var(--bg-card);
+            border-radius: 12px;
+            border: 1px solid var(--border);
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .task-item:hover {
+            transform: translateX(5px);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .task-item.completed {
+            opacity: 0.6;
+        }
+
+        .task-item.completed .task-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        /* Custom Checkbox */
+        .checkbox {
+            width: 24px;
+            height: 24px;
+            border: 2px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .checkbox:hover {
+            border-color: var(--success);
+        }
+
+        .task-item.completed .checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .checkbox::after {
+            content: '✓';
+            color: white;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .task-item.completed .checkbox::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .task-text {
+            flex: 1;
+            font-size: 1rem;
+        }
+
+        /* Task Action Buttons */
+        .task-actions {
+            display: flex;
+            gap: 8px;
+            opacity: 0;
+            transition: opacity 0.2s;
+        }
+
+        .task-item:hover .task-actions {
+            opacity: 1;
+        }
+
+        .add-subtask-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            background: transparent;
+            color: var(--warning);
+            border: 1px solid var(--warning);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .add-subtask-btn:hover {
+            background: var(--warning);
+            color: var(--bg-dark);
+        }
+
+        .delete-btn {
+            padding: 6px 10px;
+            font-size: 0.8rem;
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* ===== SUB-TASKS ===== */
+        .subtask-list {
+            list-style: none;
+            margin-left: 30px;
+            margin-top: 8px;
+            border-left: 2px solid var(--border);
+            padding-left: 15px;
+        }
+
+        .subtask-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 12px 15px;
+            background: var(--bg-subtask);
+            border-radius: 8px;
+            margin-bottom: 6px;
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        .subtask-item:hover {
+            transform: translateX(3px);
+        }
+
+        .subtask-item.completed {
+            opacity: 0.5;
+        }
+
+        .subtask-item.completed .subtask-text {
+            text-decoration: line-through;
+            color: var(--text-muted);
+        }
+
+        .subtask-checkbox {
+            width: 18px;
+            height: 18px;
+            border: 2px solid var(--border);
+            border-radius: 4px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+            flex-shrink: 0;
+        }
+
+        .subtask-checkbox:hover {
+            border-color: var(--success);
+        }
+
+        .subtask-item.completed .subtask-checkbox {
+            background: var(--success);
+            border-color: var(--success);
+        }
+
+        .subtask-checkbox::after {
+            content: '✓';
+            color: white;
+            font-size: 0.7rem;
+            font-weight: bold;
+            opacity: 0;
+            transform: scale(0);
+            transition: all 0.2s;
+        }
+
+        .subtask-item.completed .subtask-checkbox::after {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        .subtask-text {
+            flex: 1;
+            font-size: 0.9rem;
+        }
+
+        .subtask-delete-btn {
+            padding: 4px 8px;
+            font-size: 0.75rem;
+            background: transparent;
+            color: var(--danger);
+            border: 1px solid var(--danger);
+            border-radius: 4px;
+            cursor: pointer;
+            opacity: 0;
+            transition: all 0.2s;
+        }
+
+        .subtask-item:hover .subtask-delete-btn {
+            opacity: 1;
+        }
+
+        .subtask-delete-btn:hover {
+            background: var(--danger);
+            color: white;
+        }
+
+        /* Subtask Input */
+        .subtask-input-wrapper {
+            display: flex;
+            gap: 8px;
+            margin-left: 30px;
+            margin-top: 8px;
+            padding-left: 15px;
+            animation: slideIn 0.2s ease-out;
+        }
+
+        .subtask-input {
+            flex: 1;
+            padding: 10px 14px;
+            font-size: 0.9rem;
+            border: 2px solid var(--border);
+            border-radius: 8px;
+            background: var(--bg-subtask);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.3s;
+        }
+
+        .subtask-input:focus {
+            border-color: var(--warning);
+        }
+
+        .subtask-input::placeholder {
+            color: var(--text-muted);
+        }
+
+        .subtask-add-btn {
+            padding: 10px 16px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            background: var(--warning);
+            color: var(--bg-dark);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: transform 0.2s;
+        }
+
+        .subtask-add-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .subtask-cancel-btn {
+            padding: 10px 12px;
+            font-size: 0.85rem;
+            background: transparent;
+            color: var(--text-muted);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .subtask-cancel-btn:hover {
+            border-color: var(--text-muted);
+        }
+
+        /* ===== EMPTY STATE ===== */
+        .empty-state {
+            text-align: center;
+            padding: 60px 20px;
+            color: var(--text-muted);
+        }
+
+        .empty-state .emoji {
+            font-size: 4rem;
+            margin-bottom: 16px;
+        }
+
+        .empty-state p {
+            font-size: 1.1rem;
+        }
+
+        /* ===== FOOTER ===== */
+        footer {
+            text-align: center;
+            margin-top: 40px;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header>
+            <h1>✨ My Tasks for Today</h1>
+            <p class="subtitle">Stay organized, get things done</p>
+        </header>
+
+        <!-- Input Section -->
+        <div class="input-section">
+            <input type="text" id="taskInput" placeholder="What needs to be done?" autocomplete="off">
+            <select id="categorySelect" class="category-select">
+                <option value="others">Others</option>
+                <option value="work">Work</option>
+                <option value="personal">Personal</option>
+                <option value="urgent">Urgent</option>
+            </select>
+            <button class="add-btn" onclick="addTask()">Add</button>
+        </div>
+
+        <!-- Stats -->
+        <div class="stats">
+            <div class="stat">
+                <div class="stat-number" id="totalTasks">0</div>
+                <div class="stat-label">Total</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="completedTasks">0</div>
+                <div class="stat-label">Done</div>
+            </div>
+            <div class="stat">
+                <div class="stat-number" id="pendingTasks">0</div>
+                <div class="stat-label">Pending</div>
+            </div>
+        </div>
+
+        <!-- Task List -->
+        <ul class="task-list" id="taskList">
+            <!-- Tasks will appear here -->
+        </ul>
+
+        <!-- Empty State (shown when no tasks) -->
+        <div class="empty-state" id="emptyState">
+            <div class="emoji">📝</div>
+            <p>No tasks yet. Add one above!</p>
+        </div>
+
+        <!-- Footer -->
+        <footer>
+            <p>Built by Martin 🚀</p>
+        </footer>
+    </div>
+
+    <script>
+        // ===== DATA: Store our tasks =====
+        let tasks = [];
+        let activeSubtaskInput = null; // Track which task has the subtask input open
+
+        // ===== ADD A NEW TASK =====
+        function addTask() {
+            const input = document.getElementById('taskInput');
+            const text = input.value.trim();
+
+            // Don't add empty tasks
+            if (text === '') {
+                input.focus();
+                return;
+            }
+
+            // Create a new task object with subtasks array and category
+            const categorySelect = document.getElementById('categorySelect');
+            const task = {
+                id: Date.now(),
+                text: text,
+                category: categorySelect.value, // NEW: Capture category
+                completed: false,
+                subtasks: []
+            };
+
+            // Add to our tasks array
+            tasks.push(task);
+
+            // Clear the input
+            input.value = '';
+            input.focus();
+
+            // Update the display
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== TOGGLE TASK COMPLETE/INCOMPLETE =====
+        function toggleTask(id) {
+            tasks = tasks.map(task => {
+                if (task.id === id) {
+                    task.completed = !task.completed;
+                    // Optionally: mark all subtasks as complete too
+                    if (task.completed) {
+                        task.subtasks = task.subtasks.map(st => ({ ...st, completed: true }));
+                    }
+                }
+                return task;
+            });
+
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== DELETE A TASK =====
+        function deleteTask(id) {
+            tasks = tasks.filter(task => task.id !== id);
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== SHOW SUBTASK INPUT =====
+        function showSubtaskInput(taskId) {
+            activeSubtaskInput = taskId;
+            renderTasks();
+            // Focus the input after render
+            setTimeout(() => {
+                const input = document.getElementById(`subtaskInput-${taskId}`);
+                if (input) input.focus();
+            }, 50);
+        }
+
+        // ===== HIDE SUBTASK INPUT =====
+        function hideSubtaskInput() {
+            activeSubtaskInput = null;
+            renderTasks();
+        }
+
+        // ===== ADD A SUBTASK =====
+        function addSubtask(taskId) {
+            const input = document.getElementById(`subtaskInput-${taskId}`);
+            const text = input.value.trim();
+
+            if (text === '') {
+                input.focus();
+                return;
+            }
+
+            // Find the parent task and add subtask
+            tasks = tasks.map(task => {
+                if (task.id === taskId) {
+                    task.subtasks.push({
+                        id: Date.now(),
+                        text: text,
+                        completed: false
+                    });
+                }
+                return task;
+            });
+
+            activeSubtaskInput = null;
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== TOGGLE SUBTASK COMPLETE =====
+        function toggleSubtask(taskId, subtaskId) {
+            tasks = tasks.map(task => {
+                if (task.id === taskId) {
+                    task.subtasks = task.subtasks.map(st => {
+                        if (st.id === subtaskId) {
+                            st.completed = !st.completed;
+                        }
+                        return st;
+                    });
+                }
+                return task;
+            });
+
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== DELETE A SUBTASK =====
+        function deleteSubtask(taskId, subtaskId) {
+            tasks = tasks.map(task => {
+                if (task.id === taskId) {
+                    task.subtasks = task.subtasks.filter(st => st.id !== subtaskId);
+                }
+                return task;
+            });
+
+            renderTasks();
+            saveTasks();
+        }
+
+        // ===== RENDER TASKS TO THE SCREEN =====
+        function renderTasks() {
+            const taskList = document.getElementById('taskList');
+            const emptyState = document.getElementById('emptyState');
+
+            // Show/hide empty state
+            emptyState.style.display = tasks.length === 0 ? 'block' : 'none';
+
+            // Build the HTML for all tasks
+            taskList.innerHTML = tasks.map(task => `
+                <li class="task-wrapper">
+                    <div class="task-item ${task.completed ? 'completed' : ''}">
+                        <div class="checkbox" onclick="toggleTask(${task.id})"></div>
+                        <span class="category-tag cat-${task.category || 'others'}">${task.category || 'others'}</span>
+                        <span class="task-text">${task.text}</span>
+                        <div class="task-actions">
+                            ${!task.completed ? `<button class="add-subtask-btn" onclick="showSubtaskInput(${task.id})">+ Sub</button>` : ''}
+                            <button class="delete-btn" onclick="deleteTask(${task.id})">Delete</button>
+                        </div>
+                    </div>
+                    
+                    ${task.subtasks.length > 0 ? `
+                        <ul class="subtask-list">
+                            ${task.subtasks.map(st => `
+                                <li class="subtask-item ${st.completed ? 'completed' : ''}">
+                                    <div class="subtask-checkbox" onclick="toggleSubtask(${task.id}, ${st.id})"></div>
+                                    <span class="subtask-text">${st.text}</span>
+                                    <button class="subtask-delete-btn" onclick="deleteSubtask(${task.id}, ${st.id})">✕</button>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    ` : ''}
+                    
+                    ${activeSubtaskInput === task.id ? `
+                        <div class="subtask-input-wrapper">
+                            <input 
+                                type="text" 
+                                class="subtask-input" 
+                                id="subtaskInput-${task.id}"
+                                placeholder="Add a subtask..."
+                                onkeypress="if(event.key === 'Enter') addSubtask(${task.id})"
+                            >
+                            <button class="subtask-add-btn" onclick="addSubtask(${task.id})">Add</button>
+                            <button class="subtask-cancel-btn" onclick="hideSubtaskInput()">Cancel</button>
+                        </div>
+                    ` : ''}
+                </li>
+            `).join('');
+
+            // Update stats
+            updateStats();
+        }
+
+        // ===== UPDATE STATISTICS =====
+        function updateStats() {
+            // Count all tasks and subtasks
+            let total = 0;
+            let completed = 0;
+
+            tasks.forEach(task => {
+                total++; // Count the main task
+                if (task.completed) completed++;
+
+                // Count subtasks
+                task.subtasks.forEach(st => {
+                    total++;
+                    if (st.completed) completed++;
+                });
+            });
+
+            const pending = total - completed;
+
+            document.getElementById('totalTasks').textContent = total;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('pendingTasks').textContent = pending;
+        }
+
+        // ===== SAVE TASKS TO BROWSER STORAGE =====
+        function saveTasks() {
+            localStorage.setItem('myTasks', JSON.stringify(tasks));
+        }
+
+        // ===== LOAD TASKS FROM BROWSER STORAGE =====
+        function loadTasks() {
+            const saved = localStorage.getItem('myTasks');
+            if (saved) {
+                tasks = JSON.parse(saved);
+                // Ensure all tasks have subtasks array (for backwards compatibility)
+                tasks = tasks.map(task => ({
+                    ...task,
+                    subtasks: task.subtasks || []
+                }));
+                renderTasks();
+            }
+        }
+
+        // ===== EVENT LISTENERS =====
+        // Press Enter to add task
+        document.getElementById('taskInput').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') {
+                addTask();
+            }
+        });
+
+        // Load saved tasks when page loads
+        loadTasks();
+    </script>
+</body>
+
+</html>

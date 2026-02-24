@@ -538,6 +538,56 @@
             color: var(--text-muted);
         }
 
+        /* ===== PRIORITY TAGS ===== */
+        .priority-tag {
+            font-size: 0.7rem;
+            padding: 4px 10px;
+            border-radius: 6px;
+            text-transform: uppercase;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: none;
+            outline: none;
+            color: white;
+            appearance: none;
+            -webkit-appearance: none;
+            text-align: center;
+        }
+
+        .priority-tag:hover {
+            filter: brightness(1.2);
+            transform: translateY(-1px);
+        }
+
+        .priority-tag:hover::after {
+            content: ' ▾';
+            font-size: 0.8rem;
+        }
+
+        .priority-low {
+            background: #10b981;
+        }
+
+        .priority-medium {
+            background: #f59e0b;
+        }
+
+        .priority-high {
+            background: #ef4444;
+        }
+
+        .priority-select {
+            padding: 10px;
+            border-radius: 12px;
+            background: var(--bg-card);
+            color: var(--text);
+            border: 2px solid var(--border);
+            outline: none;
+            cursor: pointer;
+        }
+
         /* ===== EMPTY STATE ===== */
         .empty-state {
             text-align: center;
@@ -581,6 +631,11 @@
                 <option value="work">Work</option>
                 <option value="personal">Personal</option>
                 <option value="urgent">Urgent</option>
+            </select>
+            <select id="prioritySelect" class="priority-select">
+                <option value="low">Low</option>
+                <option value="medium">Medium</option>
+                <option value="high">High</option>
             </select>
             <button class="add-btn" onclick="addTask()">Add</button>
         </div>
@@ -634,14 +689,16 @@
                 return;
             }
 
-            // Create a new task object with subtasks array, category, and due date
+            // Create a new task object with subtasks array, category, due date, and priority
             const categorySelect = document.getElementById('categorySelect');
             const dueDateInput = document.getElementById('dueDateInput');
+            const prioritySelect = document.getElementById('prioritySelect');
             const task = {
                 id: Date.now(),
                 text: text,
                 category: categorySelect.value,
                 dueDate: dueDateInput.value || null,
+                priority: prioritySelect.value,
                 completed: false,
                 subtasks: []
             };
@@ -652,6 +709,7 @@
             // Clear the inputs
             input.value = '';
             dueDateInput.value = '';
+            prioritySelect.value = 'low';
             input.focus();
 
             // Update the display
@@ -770,6 +828,18 @@
             saveTasks();
         }
 
+        // ===== CHANGE TASK PRIORITY =====
+        function changePriority(id, newPriority) {
+            tasks = tasks.map(task => {
+                if (task.id === id) {
+                    task.priority = newPriority;
+                }
+                return task;
+            });
+            renderTasks();
+            saveTasks();
+        }
+
         // ===== DUE DATE HELPER =====
         function getDueDateInfo(dateStr) {
             if (!dateStr) return null;
@@ -803,6 +873,11 @@
                             <option value="work" ${task.category === 'work' ? 'selected' : ''}>Work</option>
                             <option value="personal" ${task.category === 'personal' ? 'selected' : ''}>Personal</option>
                             <option value="urgent" ${task.category === 'urgent' ? 'selected' : ''}>Urgent</option>
+                        </select>
+                        <select class="priority-tag priority-${task.priority || 'low'}" onchange="changePriority(${task.id}, this.value)">
+                            <option value="low" ${(task.priority || 'low') === 'low' ? 'selected' : ''}>Low</option>
+                            <option value="medium" ${task.priority === 'medium' ? 'selected' : ''}>Medium</option>
+                            <option value="high" ${task.priority === 'high' ? 'selected' : ''}>High</option>
                         </select>
                         <span class="task-text">${task.text}</span>
                         ${(() => { const info = getDueDateInfo(task.dueDate); return info ? `<span class="due-date-badge ${info.className}">${info.label}</span>` : ''; })()}
@@ -882,7 +957,8 @@
                 tasks = tasks.map(task => ({
                     ...task,
                     subtasks: task.subtasks || [],
-                    dueDate: task.dueDate || null
+                    dueDate: task.dueDate || null,
+                    priority: task.priority || 'low'
                 }));
                 renderTasks();
             }
